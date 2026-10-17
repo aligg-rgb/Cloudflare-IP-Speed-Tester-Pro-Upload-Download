@@ -1,0 +1,19 @@
+{
+  "Domain": "your-worker.your-subdomain.workers.dev",
+  "VlessLink": "vless://00000000-0000-0000-0000-000000000000@1.1.1.1:443?security=tls&sni=your-worker.your-subdomain.workers.dev&type=ws&fp=chrome&alpn=http%2F1.1&path=%2Fvl#CleanIP",
+  "EnableXrayTest": true,
+  "UploadViaXray": false,
+  "EnableFragmentation": true,
+  "FragmentPackets": "1-3",
+  "FragmentLength": "100-200",
+  "FragmentInterval": "10-20",
+  "DpiTestUrl": "http://www.google.com/generate_204",
+  "FileSizeMB": 10,
+  "UploadTimeSec": 10,
+  "TestRounds": 3,
+  "HandshakeRounds": 4,
+  "PingCount": 6,
+  "MaxJobs": 4,
+  "PayloadName": "upload_payload.dat"
+}
+
