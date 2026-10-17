@@ -1,0 +1,14 @@
+# Private configuration containing worker and VLESS links
+config.json
+
+# Test data & outputs
+temp_data.csv
+final_report.csv
+final_report.txt
+*.dat
+upload_payload.dat
+
+# Temporary files
+temp_*
+xray_*
+curl_*
