@@ -78,7 +78,7 @@
 
 ### 📥 مراحل دانلود و استخراج هسته رسمی:
 1. وارد صفحه انتشارات رسمی گیت‌هاب پروژه XTLS شوید:
-   👉 **[https://github.com/XTLS/Xray-core/releases](https://github.com/XTLS/Xray-core/releases)**
+   👈 **[https://github.com/XTLS/Xray-core/releases](https://github.com/XTLS/Xray-core/releases)**
 2. آخرین نسخه پایدار (Latest Release) را پیدا کنید.
 3. با توجه به معماری ویندوز خود، فایل زیپ مربوطه را دانلود کنید:
    * برای اکثر کامپیوترها (ویندوز ۶۴ بیتی معمولی): **`Xray-windows-64.zip`**
