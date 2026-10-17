@@ -11,7 +11,7 @@
 ---
 
 ### 🌐 زبان / Language Selection
-**[👉 برای مشاهده راهنما به زبان انگلیسی اینجا کلیک کنید | Click here for English Documentation 👈](#-english-documentation)**
+**[ 👈برای مشاهده راهنما به زبان انگلیسی اینجا کلیک کنید | Click here for English Documentation 👉](#-english-documentation)**
 
 ---
 
@@ -255,7 +255,7 @@
 
 ---
 
-**[👉 برای بازگشت به راهنمای زبان فارسی اینجا کلیک کنید 👈](#-cloudflare-ip-speed-tester-pro-upload--download)**
+**[👈 برای بازگشت به راهنمای زبان فارسی اینجا کلیک کنید 👉](#-cloudflare-ip-speed-tester-pro-upload--download)**
 
 ---
 
