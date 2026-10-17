@@ -184,7 +184,7 @@
 
 ### مرحله اول: بررسی فایل‌های پوشه
 مطمئن شوید در پوشه برنامه فایل‌های زیر حاضر باشند:
-* `SpeedTesterPro.ps1` (یا `33.ps1`)
+* `test-Upload-v0.08.ps1`
 * `Run.bat`
 * `config.json`
 * `ip.txt` (شامل لیست آی‌پی‌های مدنظر)
@@ -196,7 +196,7 @@
 2. **روش دستی در محیط ترمینال (PowerShell):**
    یک پنجره PowerShell باز کرده و دستور زیر را اجرا کنید:
    ```powershell
-   powershell.exe -ExecutionPolicy Bypass -File .\SpeedTesterPro.ps1
+   powershell.exe -ExecutionPolicy Bypass -File .\test-Upload-v0.08.ps1
    ```
 
 ### مرحله سوم: نظارت بر فرآیند تست در کنسول هوشمند
@@ -402,7 +402,7 @@ Modify `config.json` with your parameters:
 ## Step-by-Step Execution Guide
 
 1. Ensure the following files reside in your workspace directory:
-   * `SpeedTesterPro.ps1` (or `33.ps1`)
+   * `test-Upload-v0.08.ps1`
    * `Run.bat`
    * `config.json`
    * `ip.txt`
@@ -411,7 +411,7 @@ Modify `config.json` with your parameters:
    * Double-click **`Run.bat`**, or
    * Launch a PowerShell terminal and run:
      ```powershell
-     powershell.exe -ExecutionPolicy Bypass -File .\SpeedTesterPro.ps1
+     powershell.exe -ExecutionPolicy Bypass -File .\test-Upload-v0.08.ps1
      ```
 3. Observe real-time progress via the **Smart Buffer** console. Handshake, jitter, loss, and upload speeds are printed sequentially.
 4. When finished, inspect the ranked results in **`output_upload_result.csv`**.
