@@ -1,296 +1,445 @@
+<div align="center">
 
 # 🚀 Cloudflare IP Speed Tester Pro (Upload & Download)
+### ابزار تخصصی، چندنخی و هوشمند ارزیابی و استخراج تمیزترین آی‌پی‌های کلادفلر
+### High-Performance Multi-Threaded Cloudflare Clean IP Scanner & Benchmarking Suite
 
-به کامل‌ترین و پیشرفته‌ترین مستندات پروژه اسکریپت‌های سنجش کیفیت آی‌پی‌های کلادفلر (Cloudflare) خوش آمدید! 
-این پروژه شامل مجموعه اسکریپت‌های قدرتمند پاورشل (`Windows PowerShell 5.1` و بالاتر) است که برای تست، آنالیز شبکه‌ای و استخراج پایدارترین و سریع‌ترین IPهای تمیز (Clean IPs) جهت استفاده در شبکه‌های فیلترشده (پنل‌های BPB، کانفیگ‌های V2Ray، Fragment و غیره) طراحی شده است.
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](https://learn.microsoft.com/en-us/powershell/)
+[![Xray-core](https://img.shields.io/badge/Xray--core-Official_Upstream-red.svg)](https://github.com/XTLS/Xray-core)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-👉 **[لینک ویدیو آموزشی هم به زودی میزارم]**
+### 🌐 زبان / Language Selection
+**[👉 برای مشاهده راهنما به زبان انگلیسی اینجا کلیک کنید | Click here for English Documentation 👈](#-english-documentation)**
 
+---
+
+</div>
+
+## 📑 فهرست مطالب (Table of Contents)
+1. [معرفی کلی پروژه](#-معرفی-کلی-پروژه)
+2. [قابلیت‌ها و ویژگی‌های جدید نسخه آپلود (نسخه حرفه‌ای)](#-قابلیت‌ها-و-ویژگی‌های-جدید-نسخه-آپلود-نسخه-حرفه‌ای)
+3. [⚠️ مرحله صفر و بسیار مهم: دریافت آخرین نسخه هسته Xray-core](#-مرحله-صفر-و-بسیار-مهم-دریافت-آخرین-نسخه-هسته-xray-core)
+4. [پیش‌نیازها و نحوه استخراج آی‌پی‌های اولیه (ip.txt)](#-پیش‌نیازها-و-نحوه-استخراج-آی‌پی‌های-اولیه-iptxt)
+5. [آموزش گام‌به‌گام راه‌اندازی ورکر کلادفلر (worker.js)](#-آموزش-گام‌به‌گام-راه‌اندازی-ورکر-کلادفلر-workerjs)
+6. [راهنمای جامع پیکربندی فایل config.json](#-راهنمای-جامع-پیکربندی-فایل-configjson)
+7. [روش اجرای اسکریپت آپلود (مرحله به مرحله)](#-روش-اجرای-اسکریپت-آپلود-مرحله-به-مرحله)
+8. [تحلیل ستون‌های خروجی و صدک پایداری P90](#-تحلیل-ستون‌های-خروجی-و-صدک-پایداری-p90)
+9. [سوالات متداول، شبهات فنی و رفع عیب](#-سوالات-متداول-شبهات-فنی-و-رفع-عیب)
+10. [🌐 English Documentation](#-english-documentation)
+
+---
+
+## 🌟 معرفی کلی پروژه
+
+این پروژه یک پکیج جامع، مهندسی‌شده و فوق‌العاده سریع بر پایه **Windows PowerShell 5.1 و بالاتر** است که با هدف ارزیابی واقعی و موشکافانه آی‌پی‌های کلادفلر (Cloudflare Clean IPs) در بستر اینترنت‌های دارای اختلال و فیلترینگ شدید توسعه یافته است.
+
+برخلاف اسکنرهای سنتی که صرفاً به پینگ ساده (ICMP Ping) یا دانلود فایل‌های کوچک تکیه می‌کنند، این ابزار گلوگاه اصلی ارتباطات اینترنت—یعنی **مسیر آپلود (Egress)، زمان دست‌دهی امن TLS/TCP Handshake، پکت لاس و نوسان (Jitter)، و سازگاری با تکنیک‌های بای‌پس فیلترینگ مانند Fragment**—را با هسته رسمی **Xray-core** مورد ارزیابی دقیق قرار می‌دهد.
+
+---
+
+## 🚀 قابلیت‌ها و ویژگی‌های جدید نسخه آپلود (نسخه حرفه‌ای)
+
+در نسخه جدید این اسکریپت، ساختار برنامه به طور کامل بازنویسی و ماژولار شده و قابلیت‌های کلیدی زیر اضافه شده‌اند:
+
+1. **فایل تنظیمات مستقل (`config.json`):** دیگر نیازی به دستکاری کدهای اسکریپت یا فایل‌های PowerShell ندارید. کلیه تنظیمات ورکر، کانفیگ VLESS، فرگمنت و پارامترهای زمانی از طریق فایل خوانای `config.json` کنترل می‌شوند.
+2. **دو حالت تست مجزا و انعطاف‌پذیر:**
+   * **حالت تست مستقیم ورکر (`EnableXrayTest: false`):** ارسال درخواست‌های آپلود مستقیماً با ابزار cURL به سمت لبه کلادفلر برای سنجش خام خط ارتباطی بدون درگیر شدن هسته پروکسی.
+   * **حالت تست از طریق هسته Xray (`EnableXrayTest: true`):** تست کامل اتصال تونل VLESS به همراه کلیه قابلیت‌های مدرن هسته Xray.
+3. **تست آپلود اختصاصی از داخل تونل Xray (`UploadViaXray: true`):**
+   * با فعال بودن این گزینه، ترافیک استریم آپلود (Payload) از طریق پورت SOCKS5 محلی که خود اسکریپت برای هر تست ایجاد می‌کند تونل می‌شود. این کار به شما امکان می‌دهد سرعت واقعی آپلود را در حالتی که بسته‌ها تحت قوانین **Fragment** خرد می‌شوند اندازه بگیرید.
+4. **تنظیمات کامل دور زدن فیلترینگ با فرگمنت (Fragmentation):**
+   * کنترل مستقیم پارامترهای `packets` (مانند `tlshello` یا `1-3`)
+   * کنترل طول بسته‌ها `length` (مانند `100-200`)
+   * کنترل فاصله زمانی ارسال بسته‌ها `interval` (مانند `10-20` میلی‌ثانیه)
+   * قابلیت خاموش/روشن کردن آنی (`enable: true/false`)
+5. **مکانیزم هوشمند و تضمین‌شده بستن پروسه‌های Xray (Safe Kill Mechanism):**
+   * رهگیری دقیق شناسه‌های فرآیند (Process ID) فقط برای نمونه‌هایی از `xray.exe` که توسط خود اسکریپت باز شده‌اند.
+   * **عدم تداخل با VPN سیستم:** اگر از کلاینت‌های V2RayN، Hiddify، Nekoray یا هر فیلترشکن دیگری که از Xray استفاده می‌کند روی سیستم خود استفاده می‌کنید، اسکریپت به هیچ عنوان VPN شما را قطع نخواهد کرد و فقط پروسه‌های تست محلی خود را پاکسازی می‌کند.
+   * جلوگیری قطعی از تجمع ده‌ها پروسه معلق در Task Manager.
+6. **سیستم بازیابی و ادامه خودکار (Resume / Crash Recovery):**
+   * ذخیره لحظه‌ای نتایج هر آی‌پی در فایل موقت `temp_data.csv`.
+   * اگر برنامه به هر دلیلی بسته شود یا برق برود، با اجرای مجدد، آی‌پی‌های تست‌شده قبلی به صورت خودکار شناسایی شده و اسکریپت از ادامه کار شروع می‌کند.
+7. **محاسبه هوشمند صدک پایداری P90 (Speed P90):**
+   * حذف رکوردهای جهشی و کاذب به کمک فرمول‌های آماری صدک ۹۰ام و رتبه‌بندی نهایی آی‌پی‌ها بر اساس حداقل سرعت پایدار تضمین‌شده.
+8. **پشتیبانی کامل از مسیرهای دارای فاصله (Folders with Spaces):**
+   * اجرای بی‌نقص در مسیرهایی مانند `C:\My Projects\Speed Tester\` بدون ایجاد خطای پارس در cURL یا Xray.
+9. **تولید پرسرعت فایل تستی در حافظه و هارد (Fast Zero-Fill Payload):**
+   * ساخت فوری فایل تستی چند ده مگابایتی با استفاده از کلاس‌های خالص دات‌نت `[System.IO.File]` در کسری از ثانیه بدون فشار به رم یا هارد.
+
+---
+
+## ⚠️ مرحله صفر و بسیار مهم: دریافت آخرین نسخه هسته Xray-core
+
+> [!IMPORTANT]
+> **هسته Xray موجود در پکیج‌ها ممکن است به مرور زمان قدیمی شود.**
+> برای اینکه اسکریپت بتواند به درستی با آخرین پروتکل‌ها ارتباط برقرار کرده و فیلترینگ شدید و اختلالات DPI را با دقت بالا دور بزند، **شما همیشه باید آخرین نسخه باینری رسمی Xray-core را مستقیماً از مخزن اصلی سازندگان آن دریافت کنید.**
+
+### 📥 مراحل دانلود و استخراج هسته رسمی:
+1. وارد صفحه انتشارات رسمی گیت‌هاب پروژه XTLS شوید:
+   👉 **[https://github.com/XTLS/Xray-core/releases](https://github.com/XTLS/Xray-core/releases)**
+2. آخرین نسخه پایدار (Latest Release) را پیدا کنید.
+3. با توجه به معماری ویندوز خود، فایل زیپ مربوطه را دانلود کنید:
+   * برای اکثر کامپیوترها (ویندوز ۶۴ بیتی معمولی): **`Xray-windows-64.zip`**
+   * برای سیستم‌های ARM64: **`Xray-windows-arm64-v8a.zip`**
+4. فایل زیپ را باز کرده و سه فایل زیر را استخراج کنید و **دقیقاً در کنار اسکریپت‌ها** (در همان پوشه اصلی برنامه) قرار دهید:
+   * `xray.exe` (فایل اجرایی اصلی هسته)
+   * `geoip.dat` (دیتابیس تشخیص موقعیت جغرافیایی)
+   * `geosite.dat` (دیتابیس شناسایی دامنه‌ها)
+
+*(اگر سیستم شما اجازه جایگزینی فایل داد، گزینه Replace را انتخاب کنید).*
+
+---
+
+## 🧰 پیش‌نیازها و نحوه استخراج آی‌پی‌های اولیه (ip.txt)
+
+برای اینکه اسکریپت بتواند بهترین آی‌پی را برای شما پیدا کند، ابتدا به یک لیست خام از آی‌پی‌های کلادفلر نیاز دارید.
+
+### ۱. استفاده از نرم‌افزار قدرتمند Angry IP Scanner (پیشنهادی)
+بهترین، سبک‌ترین و مطمئن‌ترین ابزار برای اسکن مقدماتی پورت‌ها، نرم‌افزار متن‌باز **Angry IP Scanner** است:
+* 📥 **[دانلود نسخه رسمی Angry IP Scanner](https://angryip.org/download/)**
+* 💻 **[مشاهده سورس‌کد Angry IP Scanner در گیت‌هاب](https://github.com/angryip/ipscan)**
+* 🌐 **[لیست کامل رنج آی‌پی‌های رسمی کلادفلر](https://www.cloudflare.com/ips/)**
+
+### ۲. نحوه اسکن اولیه در Angry IP Scanner:
+1. برنامه Angry IP Scanner را باز کنید.
+2. در بخش **IP Range** یکی از ساب‌نت‌های کلادفلر (مثلاً `104.16.0.0` تا `104.16.255.255` یا `188.114.96.0` تا `188.114.99.255`) را وارد کنید.
+3. در بخش **Preferences -> Ports**، پورت هدف را روی **`443`** قرار دهید.
+4. دکمه **Start** را بزنید تا آی‌پی‌هایی که پورت ۴۴۳ آن‌ها باز است و پینگ می‌دهند مشخص شوند.
+5. لیست آی‌پی‌های سبز شده را استخراج کرده و آن‌ها را داخل فایل متنی **`ip.txt`** (هر آی‌پی در یک خط جداگانه) ذخیره کنید.
+
+---
+
+## ☁️ آموزش گام‌به‌گام راه‌اندازی ورکر کلادفلر (worker.js)
+
+برای اینکه تست‌های آپلود روی شبکه لبه کلادفلر با بالاترین دقت انجام شوند، نیاز به یک ورکر ساده و استاندارد در اکانت کلادفلر خود دارید:
+
+1. وارد حساب کاربری خود در داشبورد [Cloudflare](https://dash.cloudflare.com) شوید.
+2. از منوی سمت چپ روی **Workers & Pages** کلیک کنید.
+3. روی دکمه آبی رنگ **Create application** و سپس **Create Worker** کلیک نمایید.
+4. یک نام دلخواه برای ورکر خود انتخاب کرده و روی **Deploy** کلیک کنید.
+5. پس از ساخته شدن، روی دکمه **Edit code** بزنید.
+6. تمامی کدهای پیش‌فرض داخل ادیتور را پاک کنید.
+7. محتویات فایل **`worker.js`** موجود در پوشه پروژه را باز کرده، کپی کنید و در ادیتور کلادفلر Paste نمایید.
+8. دکمه **Save and Deploy** را در گوشه بالا سمت راست بزنید.
+9. اکنون آدرس دامنه ورکر شما (مثلاً `my-speed-worker.myname.workers.dev`) آماده است. این آدرس را برای مرحله بعد به خاطر بسپارید.
+
+---
+
+## ⚙️ راهنمای جامع پیکربندی فایل config.json
+
+در ریشه برنامه، فایلی به نام `config.json` (و یک نسخه نمونه با نام `config.example.json`) وجود دارد. این فایل قلب تنظیمات شماست.
+
+نمونه فایل `config.json`:
+
+```json
+{
+  "WorkerDomain": "your-worker-subdomain.workers.dev",
+  "VlessConfig": "vless://00000000-0000-0000-0000-000000000000@your-domain.com:443?path=%2F&security=tls&encryption=none&type=ws#MyConfig",
+  "EnableXrayTest": true,
+  "UploadViaXray": true,
+  "Fragmentation": {
+    "enable": true,
+    "packets": "tlshello",
+    "length": "100-200",
+    "interval": "10-20"
+  },
+  "AdvancedSettings": {
+    "FileSizeMB": 20,
+    "UploadTimeSec": 15,
+    "TestRounds": 2,
+    "HandshakeRounds": 3,
+    "PingCount": 4,
+    "MaxJobs": 3,
+    "ConnectTimeout": 5
+  }
+}
 ```
 
+### 📋 تشریح کامل پارامترها و متغیرها:
+
+| پارامتر | نوع | مقدار پیشنهادی | توضیحات فنی |
+| :--- | :--- | :--- | :--- |
+| **`WorkerDomain`** | String | `دامنه ورکر شما` | آدرس ساب‌دامین ورکر کلادفلر شما (بدون https:// و بدون اسلش اضافی). |
+| **`VlessConfig`** | String | `لینک کامل vless://` | کانفیگ VLESS بر بستر TLS/WS که روی کلادفلر کار می‌کند. اسکریپت آدرس، پورت، UUID، مسیر (Path) و SNI را به صورت خودکار از آن استخراج می‌کند. |
+| **`EnableXrayTest`** | Boolean | `true` | اگر `true` باشد، هسته Xray برای تست سلامت کانفیگ روشن می‌شود. اگر `false` باشد، اسکریپت بدون درگیر کردن Xray فقط آپلود مستقیم cURL روی ورکر را می‌سنجد. |
+| **`UploadViaXray`** | Boolean | `true` | **ویژگی کلیدی:** اگر `true` باشد، فایل ۲۰ مگابایتی آپلود از طریق تونل محلی SOCKS5 و هسته Xray ارسال می‌شود تا سرعت واقعی با فرگمنت سنجیده شود. اگر `false` باشد، آپلود از طریق cURL مستقیم به آی‌پی ارسال می‌گردد. |
+| **`Fragmentation.enable`** | Boolean | `true` | روشن یا خاموش کردن قابلیت خرد کردن پکت‌های TLS برای دور زدن فیلترینگ DPI. |
+| **`Fragmentation.packets`** | String | `"tlshello"` | بسته‌های هدف فرگمنت. مقدار متداول `"tlshello"` یا بازه عددی مانند `"1-3"` است. |
+| **`Fragmentation.length`** | String | `"100-200"` | بازه بایت‌هایی که هر تکه فرگمنت تقسیم می‌شود (مثلاً بین ۱۰۰ تا ۲۰۰ بایت). |
+| **`Fragmentation.interval`** | String | `"10-20"` | فاصله زمانی تاخیر ارسال پکت‌ها به میلی‌ثانیه (برای عبور بدون مسدودی از سیستم‌های فیلترینگ). |
+| **`AdvancedSettings.FileSizeMB`** | Number | `20` | حجم داده ارسالی برای تست اشباع پهنای باند آپلود (به مگابایت). |
+| **`AdvancedSettings.UploadTimeSec`**| Number | `15` | حداکثر زمان مجاز به ثانیه برای تست آپلود هر راند. |
+| **`AdvancedSettings.TestRounds`** | Number | `2` | تعداد راندهای تست آپلود برای محاسبه صدک آماری دقیق P90. |
+| **`AdvancedSettings.HandshakeRounds`**| Number | `3` | تعداد دفعات سنجش دقیق زمان دست‌دهی امن TLS Handshake. |
+| **`AdvancedSettings.PingCount`** | Number | `4` | تعداد پینگ برای محاسبه نرخ نوسان (Jitter) و افت بسته (Packet Loss). |
+| **`AdvancedSettings.MaxJobs`** | Number | `3` | تعداد تست‌های همزمان (Threads). برای تست آپلود مقادیر ۳ تا ۵ توصیه می‌شود تا اینترنت شما دچار خفگی نشود. |
+
+---
+
+## 🚀 روش اجرای اسکریپت آپلود (مرحله به مرحله)
+
+پس از آماده‌سازی پیش‌نیازها، مراحل زیر را به سادگی انجام دهید:
+
+### مرحله اول: بررسی فایل‌های پوشه
+مطمئن شوید در پوشه برنامه فایل‌های زیر حاضر باشند:
+* `SpeedTesterPro.ps1` (یا `33.ps1`)
+* `Run.bat`
+* `config.json`
+* `ip.txt` (شامل لیست آی‌پی‌های مدنظر)
+* `xray.exe`, `geoip.dat`, `geosite.dat`
+
+### مرحله دوم: اجرای اسکریپت
+شما می‌توانید به دو روش اسکریپت را آغاز کنید:
+1. **روش ساده (توصیه‌شده):** روی فایل **`Run.bat`** دابل‌کلیک کنید. این فایل به صورت خودکار مجوزهای لازم اجرای پاورشل را اعمال کرده و برنامه را استارت می‌زند.
+2. **روش دستی در محیط ترمینال (PowerShell):**
+   یک پنجره PowerShell باز کرده و دستور زیر را اجرا کنید:
+   ```powershell
+   powershell.exe -ExecutionPolicy Bypass -File .\SpeedTesterPro.ps1
+   ```
+
+### مرحله سوم: نظارت بر فرآیند تست در کنسول هوشمند
+اسکریپت با شروع کار، ابتدا تنظیمات پیکربندی، وضعیت فرگمنت و سلامت فایل‌های دیتابیس را بررسی می‌کند.
+سپس به کمک **سیستم بافر هوشمند (Smart Buffer)** با وجود اینکه تست‌ها به صورت چندنخی و موازی اجرا می‌شوند، گزارش هر آی‌پی را با ظاهری مرتب، منظم و رنگی در ترمینال چاپ می‌کند:
+* زمان دست‌دهی (Handshake ms)
+* نوسان پینگ (Jitter ms)
+* پکت لاس (Packet Loss %)
+* وضعیت تست Xray
+* سرعت هر راند آپلود و میانگین نهایی (Mbps و MB/s)
+
+---
+
+## 📊 تحلیل ستون‌های خروجی و صدک پایداری P90
+
+پس از اتمام فرآیند (یا در صورت توقف)، نتایج نهایی به همراه مرتب‌سازی در فایل اکسل **`output_upload_result.csv`** ذخیره می‌شوند.
+
+### تشریح ستون‌های فایل CSV:
+* **`IP`:** آی‌پی تمیز تست‌شده کلادفلر.
+* **`Speed_P90_Mbps` (معیار طلایی انتخاب):** سرعت بر پایه صدک ۹۰ام. این عدد تضمین‌کننده این است که ۹۰ درصد مواقع خط ارتباطی شما حداقل این پهنای باند را ارائه می‌دهد. بهترین آی‌پی‌ها بالاترین عدد را در این ستون دارند.
+* **`Speed_Avg_Mbps`:** میانگین سرعت آپلود در راندهای مختلف.
+* **`Speed_Max_Mbps`:** بیشترین سرعتی که آی‌پی در طول تست لمس کرده است.
+* **`Handshake_ms`:** زمان لازم بر حسب میلی‌ثانیه برای اتصال امن TLS به سرور لبه. هر چقدر کمتر باشد، کانکشن شما سریع‌تر باز می‌شود.
+* **`PacketLoss_Percent`:** درصد افت پکت (در آی‌پی‌های سالم باید ۰٪ باشد).
+* **`Jitter_ms`:** میزان نوسان پینگ (برای وب‌گردی روان و بازی آنلاین مقادیر زیر ۵ میلی‌ثانیه عالی است).
+* **`RoundResults_Mbps`:** جزئیات سرعت ثبت‌شده در تک‌تک راندها.
+* **`TestDate`:** تاریخ و ساعت دقیق ثبت رکورد.
+
+---
+
+## 🧠 سوالات متداول، شبهات فنی و رفع عیب
+
+### ۱. چرا فرگمنت در سرعت تست من تاثیری نگذاشت؟
+اگر `UploadViaXray: false` باشد، تست آپلود مستقیماً توسط cURL به آی‌پی ارسال می‌شود و بسته‌ها فرگمنت نمی‌شوند. حتماً در `config.json` مقدار **`UploadViaXray: true`** را قرار دهید تا آپلود از دل تونل فرگمنت عبور کند.
+
+### ۲. آیا اجرای اسکریپت باعث قطع شدن VPN شخصی من روی ویندوز می‌شود؟
+**خیر!** در این نسخه، مکانیزم کشتن پروسه‌ها بر اساس رهگیری اختصاصی Process ID پیاده‌سازی شده و فقط و فقط همان پروسه‌هایی که توسط اسکریپت آغاز شده‌اند بسته می‌شوند. نرم‌افزارهای V2RayN، Hiddify، Nekoray و غیره هیچ آسیبی نمی‌بینند.
+
+### ۳. چرا سرعت دانلود با آپلود متفاوت است؟
+در اکثر شبکه‌های اینترنت (مخصوصاً ADSL و اینترنت‌های همراه در ایران)، پهنای باند آپلود نامتقارن (Asymmetric) و محدودتر از دانلود است. علاوه بر این، سیستم‌های فیلترینگ DPI تمرکز شدیدی بر مسدودسازی بسته‌های ارسالی (Upload TLS ClientHello) دارند. یافتن یک آی‌پی با آپلود پایدار بزرگترین چالش در حفظ پایداری تونل‌های V2Ray است.
+
+---
+---
+
+<div id="-english-documentation"></div>
+
+<div align="center">
+
+# 🌐 English Documentation
+### Cloudflare IP Speed Tester Pro (Upload & Download Suite)
+**A state-of-the-art, multi-threaded benchmarking scanner for discovering resilient Cloudflare clean IPs under harsh censorship and DPI throttling.**
+
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](https://learn.microsoft.com/en-us/powershell/)
+[![Xray-core](https://img.shields.io/badge/Xray--core-Official_Upstream-red.svg)](https://github.com/XTLS/Xray-core)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+---
+
+**[👉 برای بازگشت به راهنمای زبان فارسی اینجا کلیک کنید 👈](#-cloudflare-ip-speed-tester-pro-upload--download)**
+
+---
+
+</div>
+
+## 📑 English Table of Contents
+1. [Overview & Architecture](#overview--architecture)
+2. [What's New in the Upload Edition](#whats-new-in-the-upload-edition)
+3. [⚠️ Step 0: Fetching Upstream Xray-Core (Mandatory)](#-step-0-fetching-upstream-xray-core-mandatory)
+4. [Prerequisites & Clean IP Discovery (ip.txt)](#prerequisites--clean-ip-discovery-iptxt)
+5. [Cloudflare Worker Deployment (worker.js)](#cloudflare-worker-deployment-workerjs)
+6. [Configuration Reference (config.json)](#configuration-reference-configjson)
+7. [Step-by-Step Execution Guide](#step-by-step-execution-guide)
+8. [Interpreting Results & The P90 Metric](#interpreting-results--the-p90-metric)
+9. [Technical FAQ & Troubleshooting](#technical-faq--troubleshooting)
+
+---
+
+## Overview & Architecture
+
+**Cloudflare IP Speed Tester Pro** is an enterprise-grade PowerShell benchmarking suite engineered to identify the highest quality, most stable, and unthrottled Cloudflare Anycast edge IP addresses.
+
+While basic ping tools or naive download tests fail to capture real-world connection resilience under deep packet inspection (DPI), this suite evaluates **Egress upload throughput, TCP/TLS Handshake latency, Packet Loss, Jitter, and end-to-end VLESS tunneling with Fragmentation bypass**.
+
+---
+
+## What's New in the Upload Edition
+
+* **External `config.json` Configuration:** Zero code editing required. Worker domains, VLESS configuration, fragmentation parameters, and thread limits are managed in a structured JSON file.
+* **Dual Operation Modes:**
+  * **Direct Worker Mode (`EnableXrayTest: false`):** Directly evaluates HTTP/TLS POST throughput to the Cloudflare edge node using native cURL.
+  * **Xray Tunnel Mode (`EnableXrayTest: true`):** Establishes an authentic VLESS connection through the local Xray-core.
+* **In-Tunnel Upload Benchmarking (`UploadViaXray: true`):**
+  * When enabled, the 20MB test payload is streamed through the ephemeral local SOCKS5 proxy spawned by Xray. This allows you to evaluate actual throughput when packets are fragmented to bypass DPI.
+* **Full Fragmentation Suite:** Granular control over `packets` (e.g. `tlshello`), byte chunk length (`length: 100-200`), and packet interval (`interval: 10-20ms`).
+* **Non-Destructive Process Management (Safe Kill):**
+  * Thread-safe PID tracking (`$Global:TrackedXrayPids`) targets only the script-spawned `xray.exe` instances.
+  * **Zero conflict with system VPNs:** Your running desktop clients (v2rayN, Nekoray, Hiddify) will never be terminated or disrupted.
+* **Seamless Resume & Crash Recovery:** Real-time state preservation in `temp_data.csv`. Interruptions or reboots will not lose progress.
+* **P90 Percentile Sorting (`Speed_P90_Mbps`):** Filters out anomalous latency spikes and ranks IPs by guaranteed sustained minimum bandwidth.
+* **Space-Resilient Path Support:** Fully supports directory paths containing spaces.
+* **Pure Windows PowerShell 5.1+ Compatibility:** Out-of-the-box operation on standard Windows 10/11 installations without extra dependencies.
+
+---
+
+## ⚠️ Step 0: Fetching Upstream Xray-Core (Mandatory)
+
+> [!IMPORTANT]
+> To ensure maximum compatibility with modern DPI evasion techniques and protocol upgrades, **always source the official Xray core binaries directly from upstream developers.**
+
+### How to update Xray-core:
+1. Visit the official XTLS/Xray-core releases page:
+   👉 **[https://github.com/XTLS/Xray-core/releases](https://github.com/XTLS/Xray-core/releases)**
+2. Download the latest release archive for Windows:
+   * 64-bit Windows: **`Xray-windows-64.zip`**
+   * ARM64 Windows: **`Xray-windows-arm64-v8a.zip`**
+3. Extract the following three files directly into the root folder of this project (alongside `SpeedTesterPro.ps1`):
+   * `xray.exe`
+   * `geoip.dat`
+   * `geosite.dat`
+
+---
+
+## Prerequisites & Clean IP Discovery (ip.txt)
+
+To scan and rank IPs, you need a pool of candidate Cloudflare IP addresses.
+
+### 1. Recommended Scanner: Angry IP Scanner
+* 📥 **[Download Angry IP Scanner (Official Site)](https://angryip.org/download/)**
+* 💻 **[Angry IP Scanner GitHub Repository](https://github.com/angryip/ipscan)**
+* 🌐 **[Official Cloudflare IP Ranges](https://www.cloudflare.com/ips/)**
+
+### 2. Scanning Instructions:
+1. Open Angry IP Scanner.
+2. Enter a Cloudflare CIDR range (e.g., `104.16.0.0` to `104.16.255.255` or `188.114.96.0` to `188.114.99.255`).
+3. Under **Preferences -> Ports**, configure target port to **`443`**.
+4. Click **Start**. Export responsive IP addresses and paste them into **`ip.txt`** (one IP per line).
+
+---
+
+## Cloudflare Worker Deployment (worker.js)
+
+To benchmark upload bandwidth against Cloudflare's edge without disk bottleneck:
+
+1. Log into your [Cloudflare Dashboard](https://dash.cloudflare.com).
+2. Navigate to **Workers & Pages -> Create Application -> Create Worker**.
+3. Choose a worker name and click **Deploy**.
+4. Click **Edit Code**, delete all default template code.
+5. Paste the complete contents of **`worker.js`** located in this repository.
+6. Click **Save and Deploy**.
+7. Note your worker URL (e.g., `my-speed-worker.myname.workers.dev`).
+
+---
+
+## Configuration Reference (config.json)
+
+Modify `config.json` with your parameters:
+
+```json
+{
+  "WorkerDomain": "your-worker-subdomain.workers.dev",
+  "VlessConfig": "vless://00000000-0000-0000-0000-000000000000@your-domain.com:443?path=%2F&security=tls&encryption=none&type=ws#MyConfig",
+  "EnableXrayTest": true,
+  "UploadViaXray": true,
+  "Fragmentation": {
+    "enable": true,
+    "packets": "tlshello",
+    "length": "100-200",
+    "interval": "10-20"
+  },
+  "AdvancedSettings": {
+    "FileSizeMB": 20,
+    "UploadTimeSec": 15,
+    "TestRounds": 2,
+    "HandshakeRounds": 3,
+    "PingCount": 4,
+    "MaxJobs": 3,
+    "ConnectTimeout": 5
+  }
+}
 ```
 
+### Parameter Breakdown:
 
-
-## 🚀 آموزش نصب و راه‌اندازی (Deployment Guide)
-
-برای قرار دادن این کد روی کلادفلر، مراحل ساده‌ی زیر را طی کنید:
-
-1. **ورود به اکانت کلادفلر:** وارد داشبورد [Cloudflare](https://dash.cloudflare.com) خود شوید.
-2. **بخش ورکرها:** از منوی سمت چپ، روی گزینه **`Workers & Pages`** کلیک کنید.
-3. **ساخت ورکر جدید:** 
-   * روی دکمه آبی رنگ **`Create Application`** و سپس **`Create Worker`** کلیک کنید.
-   * یک نام دلخواه برای ورکر خود انتخاب کنید و دکمه **`Deploy`** را بزنید.
-4. **قرار دادن کد:**
-   * در صفحه جدید، روی دکمه **`Edit code`** کلیک کنید.
-   * تمام کدهای پیش‌فرضِ موجود در صفحه ویرایشگر را به طور کامل پاک کنید.
-   * کدهای داخل فایل `worker.js` (که در همین پوشه قرار دارد) را کپی کرده و آنجا Paste کنید.
-5. **ذخیره نهایی:** در گوشه بالا سمت راست، روی دکمه **`Save and Deploy`** کلیک کنید.
-
----
-
-
-## 🧰 پیش‌نیازها: قدم اول برای شروع
-
-برای استفاده از این اسکریپت‌های قدرتمند، شما ابتدا به یک لیست خام از آی‌پی‌های کلادفلر نیاز دارید تا اسکریپت بتواند آن‌ها را تست و غربالگری کند. 
-
-در دنیای شبکه، هزاران برنامه و اسکنر مختلف برای پیدا کردن آی‌پی وجود دارد که ممکن است شما را سردرگم کنند. اما **پیشنهاد قطعی و تاییدشده‌ی ما** برای استخراج رنج آی‌پی‌ها، استفاده از نرم‌افزار محبوب، سبک و متن‌باز **Angry IP Scanner** است.
-
-**لینک‌های ضروری برای شروع:**
-* 📥 **[دانلود برنامه Angry IP Scanner (سایت رسمی)](https://angryip.org/download/)**
-* 💻 **[مخزن سورس‌کد Angry IP Scanner در گیت‌هاب](https://github.com/angryip/ipscan)**
-* 🌐 **[لیست رنج آی‌پی‌های رسمی کلادفلر (برای اسکن اولیه)](https://www.cloudflare.com/ips/)**
-
-پس از اسکن و پیدا کردن آی‌پی‌های فعال توسط این برنامه، کافیست آن‌ها را در فایل `ip.txt` کپی کنید و بقیه کار (سنجش آپلود، دانلود، Handshake و...) را به اسکریپت‌های هوشمند ما بسپارید!
-
-البته بنده یک فایل ip.txt به عنوان نمونه برای شروع کار داخل پروژه قرار دادم، اما این اصلاً گزینه خوب و حرفه‌ای نیست چون ممکنه هیچ‌کدام از این آی‌پی‌ها مناسب اینترنت شما نباشند. پس حتماً خودتان با یک اسکنر، آی‌پی‌های تازه تهیه کنید.
-
-## 🌟 قابلیت‌های اصلی اسکریپت‌ها
-
-### 📥 ۱. اسکریپت تست دانلود (Download Scanner)
-این اسکریپت پهنای باند دریافت (Ingress) اطلاعات را از لبه شبکه کلادفلر به سمت کلاینت می‌سنجد.
-* ⚡ **تست همزمان (Multi-Threading):** بررسی چند آی‌پی به صورت موازی برای صرفه‌جویی زمان[cite: 2].
-* 📊 **سنجش دقیق پهنای باند:** محاسبه دقیق سرعت دریافت و تبدیل هوشمند بایت به مگابیت (Mbps) و مگابایت بر ثانیه (MB/s) در خروجی[cite: 2].
-
-### 📤 ۲. اسکریپت پیشرفته تست آپلود (Upload Scanner)
-ابزاری فوق‌العاده دقیق برای سنجش گلوگاه اصلی اینترنت محدودشده (اختلالات آپلود و TLS/TCP).
-* 🧠 **بافر هوشمند (Smart Buffer):** اجرای تست‌ها به صورت همزمان، اما نمایش خروجی‌ها در ترمینال دقیقاً به ترتیب شماره نوبت.
-* ⏱️ **تایم‌اوت حجمی (Volume-Based Timeout):** ارزیابی سرعت بر اساس حجم منتقل‌شده در یک بازه زمانی مشخص.
-* 📉 **سنجش Jitter و Packet Loss:** ارزیابی افت بسته‌ها و نوسان شبکه پیش از شروع تست.
-* 🤝 **تست اختصاصی Handshake:** محاسبه میانگین زمان دست‌دهی امن (TCP/TLS).
-* 📈 **صدک P90 (Speed P90):** محاسبه کفِ سرعتِ مطمئن و حذف نویزهای کاذب.
+| Key | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **`WorkerDomain`** | String | `subdomain.workers.dev` | Your Cloudflare Worker hostname (without https:// prefix). |
+| **`VlessConfig`** | String | `vless://...` | Full VLESS URI. The script automatically parses the UUID, port, TLS security, and WS path. |
+| **`EnableXrayTest`** | Boolean | `true` | When `true`, tests configuration connectivity via Xray-core. |
+| **`UploadViaXray`** | Boolean | `true` | When `true`, the 20MB upload payload is routed through Xray's local SOCKS5 proxy to measure actual fragmentation upload speeds. |
+| **`Fragmentation.enable`** | Boolean | `true` | Enables or disables TLS ClientHello packet fragmentation. |
+| **`Fragmentation.packets`** | String | `"tlshello"` | Packet target for fragmentation (`"tlshello"` or packet range `"1-3"`). |
+| **`Fragmentation.length`** | String | `"100-200"` | Fragment byte length range. |
+| **`Fragmentation.interval`** | String | `"10-20"` | Delay interval between fragments in milliseconds. |
+| **`AdvancedSettings.FileSizeMB`** | Number | `20` | Upload benchmark stream payload size in Megabytes. |
+| **`AdvancedSettings.UploadTimeSec`** | Number | `15` | Maximum upload timeout per round in seconds. |
+| **`AdvancedSettings.TestRounds`** | Number | `2` | Number of test cycles per IP to calculate statistical P90. |
+| **`AdvancedSettings.HandshakeRounds`**| Number| `3` | Iterations for TCP/TLS handshake latency calculation. |
+| **`AdvancedSettings.PingCount`** | Number | `4` | ICMP probe count for Jitter and Packet Loss evaluation. |
+| **`AdvancedSettings.MaxJobs`** | Number | `3` | Concurrent worker threads (3-5 recommended to prevent local bandwidth saturation). |
 
 ---
 
-## 📥 راهنمای جامع تنظیمات اسکریپت دانلود (Download Scanner)
+## Step-by-Step Execution Guide
 
-این اسکریپت تنظیمات بسیار ساده اما مهمی دارد. تنظیمات متغیرهای اولیه در بالای اسکریپت قرار دارند:
-
-```powershell
-$TargetUrl = "https://www.digitalocean.com" # سایت هدف برای دانلود
-$Domain = "www.digitalocean.com"            # دامنه سایت هدف برای تفکیک SNI
-$MaxThreads = 6                             # تعداد تست‌های همزمان (Threads)
-
-```
-
-### توضیحات متغیرهای دانلود با مثال:
-
-* **`$TargetUrl` و `$Domain`:** در این بخش باید آدرس سایتی را قرار دهید که پشت کلادفلر باشد و در شبکه شما فیلتر نباشد. این سایت به عنوان سرور دانلود برای سنجش سرعت آی‌پی‌ها استفاده می‌شود.
-
-
-* *مثال:* در کد پیش‌فرض از `https://www.digitalocean.com` استفاده شده است. اگر این سایت فیلتر شد، می‌توانید آن را به سایت دیگری مثل `https://www.speedtest.net` تغییر دهید (هر دو متغیر باید هم‌نام باشند).
-
-
-
-
-* **`$MaxThreads = 6`:** تعیین‌کننده تعداد آی‌پی‌هایی است که به صورت همزمان در لحظه تست می‌شوند. برای اینترنت‌های خانگی معمولی اعداد **۴ تا ۶** مناسب است.
-
-
-
-### ⏱️ تنظیمات پیشرفته زمان اتصال (پنهان در کد دانلود):
-
-در قلب اسکریپت دانلود، خطی وجود دارد که فرمان اصلی `curl` را اجرا می‌کند:
-
-```powershell
-$output = & curl.exe -s -k -L -o NUL -w '%{speed_download}' --connect-timeout 2 --max-time 4 --resolve "$($Domain):443:$IP" $TargetUrl
-
-```
-
-* **`--connect-timeout 2`:** این پارامتر به اسکریپت می‌گوید برای برقراری اتصال اولیه (Handshake) با هر آی‌پی، حداکثر **۲ ثانیه** منتظر بماند. اگر آی‌پی در ۲ ثانیه پاسخ نداد، به عنوان آی‌پی مرده (Failed) شناسایی شده و رد می‌شود. اگر اینترنت شما کند است، می‌توانید این عدد را به `3` یا `4` افزایش دهید.
-
-
-* **`--max-time 4`:** کل زمان تست دانلود روی ۴ ثانیه محدود شده است. این زمان برای رسیدن به پیک سرعت لبه شبکه کافیست و از هدر رفتن ترافیک جلوگیری می‌کند.
-
-
-
----
-# ☁️ Cloudflare Worker Setup (worker.js)
-
-این پوشه شامل کدهای سمت سرور (جاوا اسکریپت) است که باید روی شبکه کلادفلر دیپلوی (Deploy) شود. 
-اسکریپت‌های تست آپلود و دانلودِ شما (در سیستم ویندوز)، درخواست‌های سنگین خود را به این ورکر ارسال می‌کنند تا پایداری مسیر شبکه سنجیده شود.
+1. Ensure the following files reside in your workspace directory:
+   * `SpeedTesterPro.ps1` (or `33.ps1`)
+   * `Run.bat`
+   * `config.json`
+   * `ip.txt`
+   * `xray.exe`, `geoip.dat`, `geosite.dat`
+2. **Launch the test:**
+   * Double-click **`Run.bat`**, or
+   * Launch a PowerShell terminal and run:
+     ```powershell
+     powershell.exe -ExecutionPolicy Bypass -File .\SpeedTesterPro.ps1
+     ```
+3. Observe real-time progress via the **Smart Buffer** console. Handshake, jitter, loss, and upload speeds are printed sequentially.
+4. When finished, inspect the ranked results in **`output_upload_result.csv`**.
 
 ---
 
+## Interpreting Results & The P90 Metric
 
-
-## 📤 راهنمای جامع تنظیمات اسکریپت آپلود (Upload Scanner)
-
-تنظیمات اولیه در بالای اسکریپت آپلود به این شکل است:
-
-```powershell
-$Domain          = "your-worker-domain.com" # آدرس ورکر یا دامنه اختصاصی شما (بدون https)
-$FileSizeMB      = 20                       # حجم فایل مجازی برای تست آپلود (به مگابایت)
-$UploadTimeSec   = 15                       # زمان فرصت آپلود (به ثانیه)
-$TestRounds      = 2                        # تعداد مراحل تست آپلود برای هر IP
-$HandshakeRounds = 3                        # تعداد مراحل تست Handshake برای هر IP
-$PingCount       = 4                        # تعداد پینگ برای محاسبه Packet Loss و Jitter
-$MaxJobs         = 3                        # تعداد تست همزمان (Threads)
-
-```
-
-### توضیحات متغیرهای آپلود با مثال:
-
-* **`$UploadTimeSec = 15`:** اسکریپت دقیقاً ۱۵ ثانیه فرصت می‌دهد تا داده ارسال شود. کاهش این عدد به مثلاً `10` ثانیه سرعت اسکن را بالا می‌برد اما دقت رسیدن به سقف سرعت را در خطوط نوسان‌دار کاهش می‌دهد.
-* **`$TestRounds = 2`:** هر آی‌پی چند بار پشت سر هم زیر تست آپلود برود. عدد ۲ برای اطمینان از صحت سرعت (و محاسبه صدک P90) عالی است.
-* **`$HandshakeRounds = 3`:** تعداد دفعاتی که زمان اتصال اولیه سنجیده می‌شود.
-* **`$MaxJobs = 3`:** تعداد آی‌پی‌هایی که همزمان تست می‌شوند. برای آپلود، اعداد بالای ۳ تا ۵ ممکن است پهنای باند شما را خفه کنند.
-
-### ⏱️ تنظیمات پیشرفته زمان اتصال (پنهان در کد آپلود):
-
-در بخش اجرایی اسکریپت آپلود، تنظیمات `curl` به شکل زیر پیکربندی شده است:
-
-```powershell
-$curlArgs = @(
-    "-k", "-s",
-    "-o", "`"$DiscardBody`"",
-    "-w", "%{size_upload}|%{time_total}",
-    "-X", "POST",
-    "--data-binary", "@$PayloadPath",
-    "--connect-timeout", "5",                    # زمان تایم‌اوت اتصال (ثانیه)
-    "--max-time", "$UploadTimeSec",              # زمان کل تست آپلود
-    "--resolve", "${CleanDomain}:443:${ip}",
-    "https://${CleanDomain}/"
-)
-
-```
-
-* **`--connect-timeout 5`:** این پارامتر به `curl` می‌گوید که مانند زنگ در، نهایتاً **۵ ثانیه** منتظر باز شدن در (برقراری اتصال اولیه و Handshake) بماند. اگر اینترنت قطعی‌های لحظه‌ای زیادی دارد این عدد برای شما مناسب است، اما اگر می‌خواهید فقط آی‌پی‌های فوق‌سریع را پیدا کنید، می‌توانید این عدد را روی `3` تنظیم کنید تا آی‌پی‌های کند سریع‌تر خط بخورند.
-* **`--max-time "$UploadTimeSec"`:** این دستور محدودیت زمانی کل فرآیند را از متغیر اولیه (مثلاً ۱۵ ثانیه) می‌گیرد.
+* **`IP`:** The candidate Cloudflare clean IP.
+* **`Speed_P90_Mbps`:** The 90th percentile speed threshold. Indicates the speed sustained 90% of the time, effectively discarding illusory transient peaks.
+* **`Speed_Avg_Mbps`:** Mathematical mean across all completed rounds.
+* **`Speed_Max_Mbps`:** Highest peak velocity observed.
+* **`Handshake_ms`:** Latency incurred during initial TCP + TLS negotiation.
+* **`PacketLoss_Percent`:** Packet loss ratio (0% is ideal).
+* **`Jitter_ms`:** Connection stability metric; values under 5ms provide optimal responsiveness.
 
 ---
 
-## 💾 قابلیت هوشمند ادامه کار (Resume Feature)
+## Technical FAQ & Troubleshooting
 
-هر دو اسکریپت آپلود و دانلود مجهز به مکانیزم قدرتمند Resume هستند.
+### Q: Why did fragmentation not alter my test results?
+If `UploadViaXray` is set to `false`, the upload payload is transmitted directly via cURL without passing through Xray's outbound fragment rules. Set **`UploadViaXray: true`** in `config.json`.
 
-* نتایج به صورت لحظه به لحظه در فایل `temp_data.csv` ذخیره می‌شوند.
-
-
-* در صورت قطعی برق، کرش کردن سیستم یا بستن ناگهانی برنامه، زحمات شما هدر نمی‌رود.
-
-
-* با اجرای مجدد اسکریپت، برنامه به صورت خودکار فایل `temp_data.csv` را شناسایی کرده و مستقیماً از ادامه لیست تست را از سر می‌گیرد.
-
-
+### Q: Will this kill my personal active VPN connection?
+**No.** The script utilizes precise PID tracking (`$Global:TrackedXrayPids`) and targets only child processes spawned by the current script execution. Any system-wide VPN client using Xray remains unaffected.
 
 ---
 
-## 🔀 تغییر فرمول ساخت چیدمان خروجی دلخواه (Sorting Options)
-
-به صورت پیش‌فرض، اسکریپت نتایج را بر اساس **بالاترین سرعت میانگین آپلود** مرتب می‌کند. در خط ۳۵۷ اسکریپت آپلود، کد پیش‌فرض به شکل زیر است:
-
-```powershell
-$sorted =$validData | Sort-Object -Property @{Expression={[double]($_.Speed_Avg_Mbps -replace ',', '.')}; Descending=$true}
-
-```
-
-شما می‌توانید با جایگزین کردن کدهای زیر، اولویت چیدمان را تغییر دهید:
-
-* **چیدمان بر اساس کمترین زمان Handshake (سریع‌ترین پینگ واقعی)**:
-
-
-```powershell
-$sorted =$validData | Sort-Object -Property @{Expression={[double]($_.Handshake_ms -replace ',', '.')}; Descending=$false}
-
-```
-
-
-* **چیدمان بر اساس کمترین نوسان (Jitter) مناسب برای گیمرها**:
-
-
-```powershell
-$sorted =$validData | Sort-Object -Property @{Expression={[double]($_.Jitter_ms -replace ',', '.')}; Descending=$false}
-
-```
-
-
-* **چیدمان بر اساس بالاترین سرعت صدک (P90) برای تضمین پایداری**:
-
-
-```powershell
-$sorted =$validData | Sort-Object -Property @{Expression={[double]($_.Speed_P90_Mbps -replace ',', '.')}; Descending=$true}
-
-```
-
-
-
----
-
-## 🧹 پاک‌سازی متن‌های اضافی از فایل‌های CSV (ترفند VS Code)
-
-برای پاک کردن سریع متن‌های اضافی جلوی آی‌پی‌ها در فایل‌های خام، نرم‌افزار **VS Code** را باز کرده، کلیدهای `Ctrl + H` را بزنید، قابلیت Regex (`.*`) را روشن کرده و از کدهای زیر استفاده کنید:
-
-1. **برای پاک کردن فاصله‌ها و هر متنی که بعد از آن است**:
-
-
-* عبارت جستجو: `\s+.*`
-
-
-
-2. **برای استخراج آی‌پی خالص از داخل کوتیشن‌ها**:
-
-
-* عبارت جستجو: `^"([^"]+)".*`
-
-* عبارت جایگزین: `$1`
-
-
-
-3. **برای پاک کردن کاما و تمام عبارات بعد از آن**:
-
-
-* عبارت جستجو: `,.*`
-
-
-
-
----
-
-## 🧠 پرسش‌های چالش‌برانگیز و شبهات فنی گسترده (Technical Deep Dive & Skeptical FAQ)
-
-### ❓ سوال ۱: در اسکریپت دانلود زمان تست را فقط ۴ ثانیه (`--max-time 4`) گذاشته‌اید. آیا ۴ ثانیه برای گرفتن سرعت واقعی یک آی‌پی کافی است؟
-
-> **پاسخ فنی:** بله، در معماری شبکه‌های مدرن ۴ ثانیه کاملاً منطقی است. هدف ما در این اسکریپت دانلودِ یک فایل حجیم نیست؛ بلکه می‌خواهیم از مرحله TCP Slow-Start عبور کرده و به پیکِ (Peak) سرعت لوله ارتباطی برسیم. در تست‌های متعدد ثابت شده است که اتصال به لبه (Edge) کلادفلر در ثانیه دوم به حداکثر پهنای باند می‌رسد. با محدود کردن تست به ۴ ثانیه، هم از هدر رفتن صدها گیگابایت ترافیک اینترنت جلوگیری می‌کنیم و هم می‌توانیم هزاران آی‌پی را در کسری از زمان اسکن کنیم.
-> 
-> 
-
-### ❓ سوال ۲: شما در تست دانلود از سایتی مثل DigitalOcean استفاده کرده‌اید. آیا کش شدن (Caching) فایل‌ها روی کلادفلر نتایج سرعت را نامعتبر نمی‌کند؟
-
-> **پاسخ فنی:** برعکس، کش شدن دقیقاً همان چیزی است که ما می‌خواهیم! ما قصد نداریم سرعت سرورهای اصلی DigitalOcean را بسنجیم. ما در حال تستِ **ارتباط بین مودم شما و سرور لبه (Edge Node) کلادفلر** هستیم. وقتی دیتا روی کلادفلر کش شده باشد، سرور لبه با حداکثر سرعتِ ممکن دیتا را به سمت شما شلیک می‌کند و تنها گلوگاه موجود، سیستم فیلترینگ یا پهنای باند مودم شما خواهد بود. این دقیق‌ترین روش برای یافتن یک IP فیلترنشده و پرسرعت است.
-
-### ❓ سوال ۳: شما ادعای تست آپلود روی Cloudflare Worker دارید، در حالی که ورکرها فضای ذخیره‌سازی (Disk) ندارند! چطور می‌توانید فایل آپلود کرده و سرعت بسنجید؟
-
-> **پاسخ فنی:** هدف ما از این تست، ارزیابی "سرعت هارد دیسک سرور مقصد" نیست، بلکه **اشباع کردن لوله ارسال داده (TCP Pipeline Saturation) و سنجش اختلالات فیلترینگ (Ingress Throttling)** است.
-> وقتی اسکریپت با دستور `curl` یک استریم داده ۲۰ مگابایتی را به سمت پورت ۴۴۳ آی‌پی کلادفلر پرتاب می‌کند، این دیتا از شبکه زیرساخت فیلترینگ عبور کرده و به اولین لبه کلادفلر می‌رسد. ما با پارامتر `size_upload` دقیقاً می‌سنجیم که مسیر شبکه روی آن آی‌پی خاص چقدر اجازه داده است دیتا در ثانیه رد شود. بنابراین عدم وجود هارد دیسک روی ورکر هیچ تاثیری در صحت سنجش خط ارتباطی ندارد.
-
-### ❓ سوال ۴: چگونه اسکریپت شما زمان Handshake را می‌سنجد در حالی که به هیچ سرور VPS اختصاصی متصل نیست؟
-
-> **پاسخ فنی:** دست‌دهی امن (TLS Handshake) ابداً نیازی به VPS ندارد. این عملیات بین سیستم شما و لبه فیزیکی کلادفلر روی پورت ۴۴۳ انجام می‌شود. اسکریپت با فراخوانی متغیرهای داخلی `curl` شامل `%{time_connect}` و `%{time_appconnect}`، دقیقاً زمان صرف‌شده برای برقراری اتصال امن اولیه با همان آی‌پی کلادفلر را تا میلی‌ثانیه محاسبه می‌کند تا مشخص شود کدام آی‌پی در کانکت شدن فاقد تأخیر است.
-
-### ❓ سوال ۵: شبکه کلادفلر Anycast است. وقتی تمام آی‌پی‌ها به نزدیک‌ترین دیتاسنتر مسیریابی می‌شوند، تست کردن ۹۰۰ آی‌پی مختلف چه فایده‌ای دارد؟
-
-> **پاسخ فنی:** در شرایط نرمال جهانی Anycast همه را به یک دیتاسنتر هدایت می‌کند، اما در شبکه‌های محدودشده دو اتفاق رخ می‌دهد:
-> ۱. **اختلالات هدفمند (ISP Throttling):** سیستم مسدودسازی روی رنج‌های خاصی از آی‌پی‌های کلادفلر افت سرعت شدید ایجاد می‌کند در حالی که Subnetهای دیگر هنوز تمیز مانده‌اند.
-> ۲. **مسیریابی بین‌المللی متفاوت (BGP Routing):** آی‌پی‌های مختلف کلادفلر گاهی از مسیرهای کاملاً متفاوتی (مثلاً از مسیر اروپا یا خاورمیانه) خارج می‌شوند. اسکن کردن آی‌پی‌ها به ما کمک می‌کند آی‌پی‌هایی را پیدا کنیم که دقیقاً از مسیرهای خروجیِ بدون نویز عبور می‌کنند.
-
-### ❓ سوال ۶: چرا برای تست از cURL با تک‌کانکشن (Single-Stream) استفاده کرده‌اید؟
-
-> **پاسخ فنی:** استفاده از Single-Stream یک انتخاب مهندسی‌شده است. موازی‌سازی (Multi-Stream) می‌تواند گلوگاه‌ها و اختلالات واقعی لایه TLS/TCP را پنهان کند. زمانی که شما کیفیت یک اتصال تک‌مسیره را می‌سنجید، پایه‌ترین و واقعی‌ترین کششِ خط فیزیکی خود را در برابر اختلالات تست کرده‌اید. آی‌پی‌ای که در Single-Stream موفق باشد، در تونل‌های Multi-Stream عملکردی خارق‌العاده خواهد داشت.
-
----
-
-## 🌐 ابزارهای پیشنهادی و مانیتورینگ
-
-* 🔗 **[دانلود Angry IP Scanner از گیت‌هاب رسمی](https://github.com/angryip/ipscan)** (جهت استخراج رنج آی‌پی‌های اولیه)
-* 🔗 **[Javid Network Watch :: Iran Internet Freedom Monitor](https://javidnetworkwatch.com/)** (جهت مانیتورینگ ۲۴ ساعته تمامی زیرساخت‌های فیلترنت ج.ا)
-
-
-
----
-
-## 🎥 آموزش ویدیویی کامل
-
-برای درک بهتر نحوه کارکرد اسکریپت‌ها، نحوه استخراج آی‌پی‌ها و بررسی خط به خط کدها، ویدیوی آموزشی جامع (حدود ۵۰ دقیقه) تهیه شده است.
-
+<div align="center">
+Developed with precision for network freedom and high-resilience connectivity.
+</div>
